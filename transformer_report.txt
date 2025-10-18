@@ -1,0 +1,17 @@
+Model 3: Transformer
+Lastly, model 3 adopts a transformer, specifically an encoder-only transformer. The purpose of this is to explore how self-attention and positional encoding can capture long range dependencies in Natural Language Inference (NLI). This variant of transformer processes all tokens in parallel, allowing for efficient context modeling across the entire sentence pair.
+Architecture
+Input Representation and Embedding Layer
+Using nn.Embedding, each token index in the vocabulary is mapped to a 256-dimensional vector. The padding index is set to 0 to prevent the padded tokens from contributing to the embedding weights during the training. The premise and hypothesis are first tokenized and combined into one whole sequence as follows: [CLS] premise [SEP] hypothesis [SEP]. The sequence is padded to a fixed length of 256 tokens.
+Positional Encoding
+The self-attention layer of the transformer has no inherent knowledge on the position and order of the words in a sentence. Therefore, positional encoding is applied to the token embeddings to inject information about the relative or absolute position of the tokens. Sine and cosine functions are used to calculate the positions. The positions are added to the word embeddings before being passed into the transformer encoder stack.
+Transformer Encoder
+Our encoder consists of 3 layers of nn.TransformerEncoderLayer. Each layer comes with a multi-head self-attention mechanism with 4 heads, this allows the model to simultaneously focus on semantically related words anywhere in the input sequence. Next, each token’s representation is passed through a small neural network where the hidden dimension is 1024 (256 x 4). The whole encoder processes the concatenated input sequence, forming a contextualized representation for each token.
+Classification Head
+In order to obtain a fixed length vector for classification, we adopt the standard method of extracting the final hidden state corresponding to the first token of the input sequence - [CLS] token. This vector is passed through a two-layer feed-forward classifier:
+Linear(256 -> 1024) -> ReLU -> Dropout(0.1) -> Linear(1024 -> 2)
+The final layer outputs 2 logits corresponding to the ‘entails’ and ‘neutral’ classes. Cross-entropy loss is used during the training.
+Design Justification
+The encoder-only transformer was chosen because of its unified encoding. Concatenating the premise and hypothesis and then processing them as a single sequence allows the model to compute direct cross-sentence dependencies at each layer via self-attention. This is not seen in the previous models as they only encode each sentence separately. On the other hand, [CLS] token usage serves as a dedicated summary representation of the whole input sequence. It acts as the sole input to the final classifier that maps the comprehensive output of the self-attention process to the 2 final logits.
+Training Details
+Similarly to the previous models, this model was trained for 10 epochs with a batch size of 32 using the Adam optimizer. Gradient clipping is applied as it provides the training with stability. After each epoch, we calculate the validation loss and the validation accuracy and record the best performing checkpoint based on the accuracy. The final model is then reloaded to be evaluated.

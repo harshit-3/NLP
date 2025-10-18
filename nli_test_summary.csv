@@ -1,0 +1,5 @@
+Model,Test Accuracy,Parameters (M)
+Model 1 — Siamese BiLSTM,0.6839,3.68
+Model 2A — Encoder-side Attention,0.699,5.52
+Model 2B — Decoder-side Cross-Attention,0.7173,5.38
+Model 3 — Transformer,0.6966,7.88

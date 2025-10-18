@@ -2,10 +2,12 @@
 Labs/
 specification.txt
 *.pdf
+*.tex
+*.bib
 
-# Model files (too large for git)
-*.pth
-*.pkl
+# Model files
+# *.pth
+# *.pkl
 
 # Python
 __pycache__/
